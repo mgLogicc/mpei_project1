@@ -47,11 +47,11 @@ def preProcessData(contents):
     return filteredData
 
 # Function to extract the vocabulary of the entire data (every unique word alphabetically sorted)
-def buildVocabulary(preProcessedData):
+def buildVocabulary(processedData):
     
     vocabulary = set()                          # initialize set to store vocabulary
     
-    for data in preProcessedData:               # for each new 
+    for data in processedData:               # for each new 
         
         vocabulary.update(data)                 # add unique words from each document
 
@@ -60,26 +60,12 @@ def buildVocabulary(preProcessedData):
     return vocabulary
 
 
-# Function to create a bag of words of a sentence
-def createBagOfWords(sentence, vocab):
-    global counter
-    vector = [0] * len(vocab)                           # list of zeros with the size of vocabulary
-
-    print(counter)
-    for word in sentence:                               # for every word in the array
-        if word in vocab:                               # if the word is in the vocabulary
-            idx = vocab.index(word)                     # get the index of the current word
-            vector[idx] += 1                            # increment the value
-    counter += 1
-    return vector
-
-
 # Function calculates the frequency of each word in the dataset
 def getWordFrequencies(preProcessedData):
 
     wordFrequencies = {}                    # initialize the dictionary to store the frequencies of each word
 
-    for sentence in preProcessData:         # for each sentence
+    for sentence in preProcessedData:         # for each sentence
         
         for word in sentence:               # for each word
 
@@ -90,6 +76,49 @@ def getWordFrequencies(preProcessedData):
 
     return wordFrequencies
 
+# Function tot remove rare words
+def removeRareWords(preProcessedData, wordFrequencies):
+
+    processedData = []
+
+    for sentence in preProcessedData:
+       
+        processedSentence = [word for word in sentence if wordFrequencies.get(word,0) > 3]
+        processedData.append(processedSentence)
+
+    return processedData
+
+def createBagOfWords(processedData, vocab):
+
+    vector = [1] * len(vocab)
+
+    global counter 
+    counter = 0
+    for sentence in processedData:
+        print(counter)
+        
+        for word in sentence:                               # for every word in the array
+           
+            if word in vocab:                               # if the word is in the vocabulary
+                idx = vocab.index(word)                     # get the index of the current word
+                vector[idx] += 1                            # increment the value
+        
+        if (counter == 50): 
+            break
+
+        counter += 1
+
+    return vector
+    
+
+def saveVocabularyAndBowToCSV(file_name, vocabulary, bow_vector):
+
+    with open(file_name, mode='w', encoding='utf-8', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(vocabulary)  # First line: Vocabulary
+        writer.writerow(bow_vector)  # Second line: Bag of Words vector
+
+
 def main():
 
     ## Processing fake news
@@ -97,11 +126,16 @@ def main():
     file_path = 'Data/Fake.csv'                             # file path
 
     fakeContents = getData(file_path)                       # fake content  (title + article)                  
-    # print(fakeContents[0]) 
 
     preProcessFakeData = preProcessData(fakeContents)       # pre processed fake content
-    #print(preProcessFakeData)
 
+    fakeWordFreqs = getWordFrequencies(preProcessFakeData)  # get word freqs
+
+    processedFakeData = removeRareWords(preProcessFakeData, fakeWordFreqs)
+
+    fakeVocabulary = buildVocabulary(processedFakeData)     # vocabulary of the fake data
+
+    fakeBowVector = createBagOfWords(processedFakeData, fakeVocabulary)
     ##
 
     ## Processing real news
@@ -109,32 +143,29 @@ def main():
     file_path = 'Data/True.csv'                             # file parh
 
     realContents = getData(file_path)                       # real content
-    #print(realContents[0])
 
     preProcessRealData = preProcessData(realContents)       # pre processed real content
-    # print(preProcessRealData)
 
+    realWordFreqs = getWordFrequencies(preProcessRealData)      # get word freqs
+
+    processedRealData = removeRareWords(preProcessRealData, realWordFreqs)  # process the data
+
+    realVocabulary = buildVocabulary(processedRealData)        # vocabulary of the real data
+
+    #realBowVectors = [createBagOfWords(sentence, realVocabulary) for sentence in preProcessRealData]
+    realBowVector = createBagOfWords(processedRealData, realVocabulary)
+    
     #words = 0 
     #news = 0
-    #for sentence in preProcessRealData:                    #counter of news and words
+    #for sentence in processedRealData:                    #counter of news and words
     #    news = news + 1
     #    for word in sentence:
     #        words = words +1
-
     #print('news : ', news)
     #print('words : ', words)
 
-    realVocabulary = buildVocabulary(preProcessRealData)        # vocabulary of the real data
-    #print(vocabulary)
-
-    realBowVectors = [createBagOfWords(sentence, realVocabulary) for sentence in preProcessRealData]
-    #bowVectors = [createBagOfWords(preProcessRealData[i], vocabulary) for i in range(30)]
-    #print("Bag of Words Vectors:")
-    
-    #non_zero_sum = sum(value for value in bow_vectors[4] if value != 0)
-    #print(non_zero_sum)
-
-   
+    saveVocabularyAndBowToCSV('fake_vocab_bow.csv', fakeVocabulary, fakeBowVector)
+    saveVocabularyAndBowToCSV('real_vocab_bow.csv', realVocabulary, realBowVector)
 
 
 if __name__ == "__main__":
