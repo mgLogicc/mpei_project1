@@ -103,8 +103,6 @@ def createBagOfWords(processedData, vocab):
                 idx = vocab.index(word)                     # get the index of the current word
                 vector[idx] += 1                            # increment the value
         
-        if (counter == 50): 
-            break
 
         counter += 1
 
