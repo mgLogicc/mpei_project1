@@ -1,13 +1,11 @@
 # Imports
 import csv
 import nltk
-from re import sub
 from nltk.corpus import stopwords
 
 # Downloads
 nltk.download('stopwords')
 
-counter = 0
 
 # Function to extract title and content of each new in a csv file
 def getData(file_path):
@@ -37,41 +35,16 @@ def preProcessData(contents):
     #print(stop_words)
 
     filteredData = []                                       # initialize list with the filtered news contents
-    for i in range(len(contents)):                          # for each new                           
+    
+    for sentence in contents:
 
-        tokenizedContent = contents[i].lower().split()      # tokenize the content 
-        filteredContent = [word for word in tokenizedContent if word.isalpha() and word not in stop_words]   # filter out stop words and unwanted elements
+        loweredContent = sentence.lower().split()           # lower the sentence and split to check every word
 
-        filteredData.append(filteredContent)                
+        # for every word in the current sentence, if it meets the conditions, the word is added to filteredContent
+        filteredContent = [word for word in loweredContent if word.isalpha() and word not in stop_words]
+        filteredData.append(filteredContent)                # append to the data
 
     return filteredData
-
-# Function to extract the vocabulary of the entire data (every unique word alphabetically sorted)
-def buildVocabulary(preProcessedData):
-    
-    vocabulary = set()                          # initialize set to store vocabulary
-    
-    for data in preProcessedData:               # for each new 
-        
-        vocabulary.update(data)                 # add unique words from each document
-
-    vocabulary = sorted(list(vocabulary))       # sort list
-
-    return vocabulary
-
-
-# Function to create a bag of words of a sentence
-def createBagOfWords(sentence, vocab):
-    #global counter
-    vector = [0] * len(vocab)                           # list of zeros with the size of vocabulary
-
-    #print(counter)
-    for word in sentence:                               # for every word in the array
-        if word in vocab:                               # if the word is in the vocabulary
-            idx = vocab.index(word)                     # get the index of the current word
-            vector[idx] += 1                            # increment the value
-    #counter += 1
-    return vector
 
 
 # Function calculates the frequency of each word in the dataset
@@ -79,77 +52,71 @@ def getWordFrequencies(preProcessedData):
 
     wordFrequencies = {}                    # initialize the dictionary to store the frequencies of each word
 
-    for sentence in preProcessedData:         # for each sentence
+    for sentence in preProcessedData:       # for each sentence
         
         for word in sentence:               # for each word
 
-            if word in wordFrequencies:     # if the word 
-                wordFrequencies[word] += 1
-            else:
-                wordFrequencies[word] = 1
+            if word in wordFrequencies:     # if the word is in the dictionary
+                wordFrequencies[word] += 1  # increment it
+            else:   
+                wordFrequencies[word] = 1   # if not: initialize its counter
 
     return wordFrequencies
 
-def removeRareWords(preProcessedData, wordFrequencies):
+# Function tot remove rare words
+def processData(preProcessedData, wordFrequencies):
 
-    processedData = []
+    processedData = []                  # initialize the processed data
 
-    for sentence in preProcessedData:
+    for sentence in preProcessedData:   # for each sentence 
        
-        processedSentence = [word for word in sentence if wordFrequencies.get(word,0) > 1]
-        processedData.append(processedSentence)
+        # add word with only more than 3 occurences to processedSentence
+        processedSentence = [word for word in sentence if wordFrequencies.get(word,0) > 3 & isinstance(word, str)]
+        
+        # reconstructs the string from the list of words
+        reconstructedSentence = ' '.join(processedSentence)
+        processedData.append(reconstructedSentence)
+
+
 
     return processedData
+
+    
+# Function to save processed data to a CSV file
+def saveDataToCSV(file_name, data):
+    with open(file_name, mode='w', encoding='utf-8', newline='') as file:
+        writer = csv.writer(file)
+        for sentence in data:
+            writer.writerow([sentence])  # Each line contains one sentence
 
 def main():
 
     ## Processing fake news
 
     file_path = 'Data/Fake.csv'                             # file path
+    fakeData = getData(file_path)                               # store all the data from the fake news
 
-    fakeContents = getData(file_path)                       # fake content  (title + article)                  
-    # print(fakeContents[0]) 
 
-    preProcessFakeData = preProcessData(fakeContents)       # pre processed fake content
-    #print(preProcessFakeData)
+    preProcessedFakeData = preProcessData(fakeData)                             # pre process the fake data
+    fakeWordFreqs = getWordFrequencies(preProcessedFakeData)                # get word frequencies from fake data
+    processedFakeData = processData(preProcessedFakeData, fakeWordFreqs)    # process the fake data
 
     ##
 
     ## Processing real news
 
-    file_path = 'Data/True.csv'                             # file parh
+    file_path = 'Data/True.csv'                             # file path
+    realData = getData(file_path)                               # store all the data from the fake news
 
-    realContents = getData(file_path)                       # real content
-    #print(realContents[0])
 
-    preProcessRealData = preProcessData(realContents)       # pre processed real content
-    # print(preProcessRealData)
+    preProcessedRealData = preProcessData(realData)                             # pre process the real data
+    realWordFreqs = getWordFrequencies(preProcessedRealData)                    # get word frequencies from real data
+    processedRealData = processData(preProcessedRealData, realWordFreqs)        # process the real data
 
-    #words = 0 
-    #news = 0
-    #for sentence in preProcessRealData:                    #counter of news and words
-    #    news = news + 1
-    #    for word in sentence:
-    #        words = words +1
+    ##
 
-    #print('news : ', news)
-    #print('words : ', words)
-
-    realVocabulary = buildVocabulary(preProcessRealData)        # vocabulary of the real data
-    #print(vocabulary)
-
-    #realBowVectors = [createBagOfWords(sentence, realVocabulary) for sentence in preProcessRealData]
-    realBowVectors = [createBagOfWords(preProcessRealData[i], realVocabulary) for i in range(30)]
-    #print("Bag of Words Vectors:")
-    
-    #non_zero_sum = sum(value for value in bow_vectors[4] if value != 0)
-    #print(non_zero_sum)
-
-    wordFreqs = getWordFrequencies(preProcessRealData)
-    print(wordFreqs)
-
-    processedRealData = removeRareWords(preProcessRealData, wordFreqs)
-    print(processedRealData)
+    saveDataToCSV('processedFake.csv', processedFakeData)
+    saveDataToCSV('processedTrue.csv', processedRealData)
 
 
 if __name__ == "__main__":

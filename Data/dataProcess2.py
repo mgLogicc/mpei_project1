@@ -53,7 +53,8 @@ def buildVocabulary(processedData):
     
     for data in processedData:               # for each new 
         
-        vocabulary.update(data)                 # add unique words from each document
+        vocabulary.update(word for word in data if isinstance(word, str))   # add unique words from each document
+                                                                            # this ensures only string are added to the vocabulary
 
     vocabulary = sorted(list(vocabulary))       # sort list
 
@@ -92,8 +93,9 @@ def createBagOfWords(processedData, vocab):
 
     vector = [1] * len(vocab)
 
-    global counter 
+    global counter
     counter = 0
+
     for sentence in processedData:
         print(counter)
         
@@ -102,19 +104,19 @@ def createBagOfWords(processedData, vocab):
             if word in vocab:                               # if the word is in the vocabulary
                 idx = vocab.index(word)                     # get the index of the current word
                 vector[idx] += 1                            # increment the value
-        
 
         counter += 1
-
+        
     return vector
     
 
-def saveVocabularyAndBowToCSV(file_name, vocabulary, bow_vector):
+def saveVocabularyAndBowToCSV(file_name, vocabulary, bow_vector, numNews):
 
     with open(file_name, mode='w', encoding='utf-8', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(vocabulary)  # First line: Vocabulary
-        writer.writerow(bow_vector)  # Second line: Bag of Words vector
+        writer.writerow(numNews)     # First line: number of news
+        writer.writerow(vocabulary)  # Second line: Vocabulary
+        writer.writerow(bow_vector)  # Third line: Bag of Words vector
 
 
 def main():
@@ -130,6 +132,7 @@ def main():
     fakeWordFreqs = getWordFrequencies(preProcessFakeData)  # get word freqs
 
     processedFakeData = removeRareWords(preProcessFakeData, fakeWordFreqs)
+    numFakeNews = len(processedFakeData)
 
     fakeVocabulary = buildVocabulary(processedFakeData)     # vocabulary of the fake data
 
@@ -147,6 +150,7 @@ def main():
     realWordFreqs = getWordFrequencies(preProcessRealData)      # get word freqs
 
     processedRealData = removeRareWords(preProcessRealData, realWordFreqs)  # process the data
+    numRealNews = len(processedRealData)
 
     realVocabulary = buildVocabulary(processedRealData)        # vocabulary of the real data
 
@@ -162,8 +166,8 @@ def main():
     #print('news : ', news)
     #print('words : ', words)
 
-    saveVocabularyAndBowToCSV('fake_vocab_bow.csv', fakeVocabulary, fakeBowVector)
-    saveVocabularyAndBowToCSV('real_vocab_bow.csv', realVocabulary, realBowVector)
+    saveVocabularyAndBowToCSV('fake_vocab_bow.csv', fakeVocabulary, fakeBowVector, numFakeNews)
+    saveVocabularyAndBowToCSV('real_vocab_bow.csv', realVocabulary, realBowVector, numRealNews)
 
 
 if __name__ == "__main__":
