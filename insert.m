@@ -1,21 +1,17 @@
 %% insert
 function bloom_filter = insert(element, bloom_filter, k)
-
-    key = element;
-    for fh = 1:k
-
-        key = [element num2str(fh)];
-
+    % inserir elementos no bloom_filter utilizando k functions
+    for i = 1:k
+        % criar uma key para cada hash function
+        key = [element num2str(i)];
+        
+        % transformar a key em hash
         hash_code = string2hash(key);
-
-        index = mod(hash_code, length(bloom_filter));
-
-        bits(fh) = bloom_filter(index);
-
-    end
-    % apicar função
-    hash_code = string2hash(element);
+        
+        % cálculo do índice
+        index = mod(hash_code, length(bloom_filter)) + 1;
     
-    % limitar a 1 o tamanho do array
-    bloom_filter(index) = 1;
+        % limitar a 1 o tamanho do array
+        bloom_filter(index) = 1;
+    end
 end 
