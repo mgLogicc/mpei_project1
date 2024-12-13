@@ -1,4 +1,4 @@
-%% função main do projeto
+%% ficheiro de desenvolvimento e teste do Bloom Filter
 
 %teste (links que pertencem)
 % test_links = {'fort-russ.com';
