@@ -1,7 +1,7 @@
 import csv
 import sys
 
-input_file = 'Data/fake.csv'
+input_file = 'Fake.csv'
 output_file = 'bf_data_fake.csv'
 
 csv.field_size_limit(sys.maxsize)

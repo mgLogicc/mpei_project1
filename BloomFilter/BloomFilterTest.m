@@ -34,13 +34,13 @@ test_link = test_links{l}; % link em teste
 
 % parâmetros iniciais
 n = 1000; % possível tamanho do vetor 
-linkscsv = 'bf_data_fake'; % ficheiro CSV com os links
+linkscsv = 'bf_data_fake.csv'; % ficheiro CSV com os links
 k = 3; % possível nº de funções de dispersão
 
 % inicialização do bloom filter
 bloom_filter = initialize(n);
 
-data = readtable('bf_data_fake.csv'); % links processados
+data = readtable(linkscsv); % links processados
 
 % inserção de elementos no bloom filter
 for i = 1:height(data)
