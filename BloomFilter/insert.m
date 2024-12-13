@@ -14,4 +14,4 @@ function bloom_filter = insert(element, bloom_filter, k)
         % limitar a 1 o tamanho do array
         bloom_filter(index) = 1;
     end
-end 
+end
