@@ -26,35 +26,46 @@ test_links = {'www.sparkleverse.net';
     'nightowlapps.dev'
 };
 
+false_positives = 0; % nº de falsos positivos
+
 for l = 1:length(test_links) % for de teste
 test_link = test_links{l}; % link em teste
 
 
-%% verificação inicial usando Bloom Filter
+%% ------------------------------------------------------------------------
+% verificação inicial usando Bloom Filter
+
+linkscsv = 'bf_data_fake.csv'; % ficheiro CSV com os links
+
+data = readtable(linkscsv); % links processados
+
+urls=unique({data.site_url{:}});
+clear data
 
 % parâmetros iniciais
-n = 1000; % possível tamanho do vetor 
-linkscsv = 'bf_data_fake.csv'; % ficheiro CSV com os links
-k = 3; % possível nº de funções de dispersão
+n = 3e3; % tamanho do vetor 
+m = length(urls);
+k = round(log(1/2)/(m*log(1 - 1/n))); % nº de funções de dispersão
 
 % inicialização do bloom filter
 bloom_filter = initialize(n);
 
-data = readtable(linkscsv); % links processados
 
 % inserção de elementos no bloom filter
-for i = 1:height(data)
-    bloom_filter = insert(data.site_url{i}, bloom_filter, k);
+for i = 1:height(urls)
+    bloom_filter = insert(urls{i}, bloom_filter, k);
     % disp(data.site_url{i}); % mostrar o que foi inserido
 end
 
 % verificar se um link fornecido pertence à base de dados
-ismember = verify(bloom_filter, test_link, k)
+ismember = verify(bloom_filter, test_link, k);
 
-if ismember
-    % neste caso passa para o Classificador de Naive Bayes
+% -------------------------------------------------------------------------
+%% testar os nº de falsos positivos
+if ismember == 1
+    false_positives = false_positives + 1;
 end
 
-
 end % end do for de teste
+fprintf('False Positives: %d\n', false_positives)
 fprintf("end of test")

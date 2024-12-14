@@ -3,10 +3,8 @@
 
 
 
-
-%% Verificação usando o Minhash
-
-
+%% ------------------------------------------------------------------------
+% Verificação usando o Minhash
 
 
 
@@ -26,6 +24,8 @@
 
 
 
+
+% ------------------------------------------------------------------------
 %% Código que o chat deu (só queria guardar para se desse jeito)
 
 % Código Inicial para Implementar Minhash no Tema de Fake News
