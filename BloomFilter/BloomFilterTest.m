@@ -35,6 +35,8 @@ test_link = test_links{l}; % link em teste
 %% ------------------------------------------------------------------------
 % verificação inicial usando Bloom Filter
 
+linkscsv = 'bf_data_fake.csv'; % ficheiro CSV com os links
+
 data = readtable(linkscsv); % links processados
 
 urls=unique({data.site_url{:}});
@@ -42,7 +44,6 @@ clear data
 
 % parâmetros iniciais
 n = 3e3; % tamanho do vetor 
-linkscsv = 'bf_data_fake.csv'; % ficheiro CSV com os links
 m = length(urls);
 k = round(log(1/2)/(m*log(1 - 1/n))); % nº de funções de dispersão
 
