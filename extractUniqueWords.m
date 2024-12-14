@@ -6,18 +6,24 @@ function uniqueWords = extractUniqueWords(data)
     %
     %   uniqueWords : vector with the unique words of the data
     
-    allWords = [];                      % Array to store every word
 
-    for idx = 1:length(data)            % For each phrase on data
-        phrase = data{idx};             % Stores the current phrase 
-        
-        words = split(phrase);          % Vector w/the split the phrase
-        
-        for idx1 = 1:length(words)      % For each word
-            word = words(idx1);         % Store the current word
-            allWords = [allWords word]; % Concatenate the word to the array
-        end
+    % This will ensure that the data type passed in a string or char vector
+    % 'all' checks if all elements meet the condition (return true)
+    if ~all(cellfun(@(x) ischar(x) || isstring(x), data))
+        error('Input must be a cell array of strings or character vectors.');
     end
+        
+    % Convert all elements to character vectors
+    data = cellfun(@char, data, 'UniformOutput', false);
 
-    uniqueWords = unique(allWords);     % Get unique words
+    % Use regexp to split phrases into words. '\s+' will match one or more
+    % whitespace. 'split' will split the string wherever the regex matches
+    allWords = regexp(data, '\s+', 'split');
+    
+    % Concatenates the elements into a single array
+    allWords = [allWords{:}];               
+
+    % Get unique words
+    uniqueWords = unique(allWords);         % Extract unique words
+    
 end

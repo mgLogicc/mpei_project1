@@ -6,25 +6,34 @@ function wordMatrix = getWordOccurences(data, uniqueWords)
     %   uniqueWords: vector with the unique words of the data
     %
     %   wordMatrix : matrix with the occurences of the data
-
-    numDocs = length(data);             % Number of docs in data 
-    numWords = length(uniqueWords);     % Number of unique words
-
-    wordMatrix = zeros(numDocs, numWords);   % Initialize matrix
-
-    for idx1 = 1:numDocs                    % For each doc
     
-        doc = data{idx1};                   % Get the current doc
-        words = split(doc);                 % Get words from current doc
+    % Tokenize each new into a words array
+    tokenizedData = cellfun(@split,data,'UniformOutput',false);
+    
+    numDocs = length(data);                 % Number of news
+    numWords = length(uniqueWords);         % Number of words on the vocabulary
+    
+    wordMatrix = zeros(numDocs,numWords);   % Initialize word occurence matrix
+    
+    for docIdx = 1 : numDocs                % For each new
+        
+        words = tokenizedData{docIdx};      % Get the current new's word array
+    
+        % Checks if a word is member of the vocabulary and, if it is,
+        % returns the indices of the found words
+        % This will store a logical array indicating if a word is found
+        % and an array with the indices of each word in the vocabulary
+        [found, idx] = ismember(words, uniqueWords);
+    
+        if any(found)                       % If any word is found
 
-        for idx2 = 1:numWords               % For each word
-            
-            word = uniqueWords{idx2};       % Current word 
+            % Store only the indexes of the found words in the vocabulary
+            validIdx = idx(found);
 
-            % Count the number of times the current word appears in the doc
-            occurences = sum(strcmp(words,word));
-
-            wordMatrix(idx1,idx2) = occurences; % Store the value in the matrix
+            % This will add 1 on the 
+            wordCounts = accumarray(validIdx, 1, [numWords, 1]);
+        
+            wordMatrix(docIdx,:) = wordCounts';
         end
     end
 end
