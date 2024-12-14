@@ -6,7 +6,7 @@ function bloom_filter = insert(element, bloom_filter, k)
         key = [element num2str(i)];
         
         % transformar a key em hash
-        hash_code = string2hash(key);
+        hash_code = strhash(key);
         
         % cálculo do índice
         index = mod(hash_code, length(bloom_filter)) + 1;
