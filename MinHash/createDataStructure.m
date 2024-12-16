@@ -1,5 +1,6 @@
 function [Set, users] = createDataStructure(data)
     % Carrega o ficheiro
+    
     udata = load(data); 
     u = udata(:, 1:2); clear udata;
 
