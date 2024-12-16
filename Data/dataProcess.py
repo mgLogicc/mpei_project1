@@ -93,11 +93,11 @@ def main():
 
     ## Processing fake news
 
-    file_path = 'Data/Fake.csv'                             # file path
+    file_path = 'Fake.csv'                                 # file path
     fakeData = getData(file_path)                               # store all the data from the fake news
 
 
-    preProcessedFakeData = preProcessData(fakeData)                             # pre process the fake data
+    preProcessedFakeData = preProcessData(fakeData)                         # pre process the fake data
     fakeWordFreqs = getWordFrequencies(preProcessedFakeData)                # get word frequencies from fake data
     processedFakeData = processData(preProcessedFakeData, fakeWordFreqs)    # process the fake data
 
@@ -105,7 +105,7 @@ def main():
 
     ## Processing real news
 
-    file_path = 'Data/True.csv'                             # file path
+    file_path = 'True.csv'                             # file path
     realData = getData(file_path)                               # store all the data from the fake news
 
 

@@ -18,7 +18,7 @@ function wordMatrix = getWordOccurences(data, uniqueWords)
     for docIdx = 1 : numDocs                % For each new
         
         words = tokenizedData{docIdx};      % Get the current new's word array
-    
+
         % Checks if a word is member of the vocabulary and, if it is,
         % returns the indices of the found words
         % This will store a logical array indicating if a word is found
