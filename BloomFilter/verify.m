@@ -14,7 +14,7 @@ function boolean = verify(bloom_filter, element, k)
         key = [element num2str(i)];
 
         % cálculo do índice
-        index = mod(strhash(key),length(bloom_filter)) + 1;
+        index = mod(strhash(key, 5381),length(bloom_filter)) + 1;
         
         % verifica se o bit correspondente é um 1
         if bloom_filter(index) == 0
