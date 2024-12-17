@@ -24,15 +24,15 @@ k = ceil((n/m)*log(2)); % nº de funções de dispersão
 
 %% Bloom Filter Training
 
-% inicialização do bloom filter
-bloom_filter = initialize(n);
+% Check if bloom_filter does not exist or is empty
+if ~exist('bloom_filter', 'var') || isempty(bloom_filter)
+    bloom_filter = initialize(n);
 
-% inserção de elementos no bloom filter
-for i = 1:height(urls)
-    bloom_filter = insert(urls{i}, bloom_filter, k);
-    % disp(data.site_url{i}); % mostrar o que foi inserido
+    % Inserção de elementos no bloom filter
+    for i = 1:height(urls)
+        bloom_filter = insert(urls{i}, bloom_filter, k);
+    end
 end
-
 %% Inserção de Primeira Variável
 while true
     % inserção do link
@@ -63,7 +63,7 @@ if ismember == 1
     fprintf("Pressione Ctrl + C para saír.\n")
 else
     fprintf("O URL fornecido ('%s') não está marcado como fake news e terá de ser melhor avaliado.\n", link_given)
-    clear;
+
     %% Parâmetros Iniciais do Classificador de Naive Bayes
     
     prompt = 'Insira o título da notícia: ';
@@ -113,7 +113,7 @@ else
     numFakeNews = length(fakeNews);                     % Total number of fake news
     numRealNews = length(realNews);                     % Total number of real news
     
-    k = 5;                          % Size of shingles
+    kshingles = 5;                          % Size of shingles
     numHash = 300;                  % Number of hash functions
     p = 1e9 + 7;                    % High prime number
     R = randi(p, numHash,5);        % Matrix of random number for each hash function
@@ -131,7 +131,7 @@ else
 
     %fakeSignatureMatrix = zeros(numHash, fakeTrainSize); % Initialize the matrix
     %for i = 1:fakeTrainSize
-    %    shingles = generateShingles(fakeTrainNews{i}, k); 
+    %    shingles = generateShingles(fakeTrainNews{i}, kshingles); 
     %    signature = minhashSignatures(shingles, numHash, p, R); 
     %    
     %    fakeSignatureMatrix(:, i) = signature; 
@@ -146,7 +146,7 @@ else
     
     %realSignatureMatrix = zeros(numHash,realTrainSize);
     %for i = 1:realTrainSize
-    %    shingles = generateShingles(realTrainNews{i}, k);
+    %    shingles = generateShingles(realTrainNews{i}, kshingles);
     %    signature = minhashSignatures(shingles, numHash, p, R); 
     %    
     %    realSignatureMatrix(:,i) = signature;
@@ -209,24 +209,45 @@ else
 
     % finalizar a waitbar
     close(wb);
-    fprintf("Esta notícia foi classificada como %s.\n",class)
+    fprintf("\nEsta notícia foi classificada como %s.\n",class)
+    
+    if strcmp(class,'Fake')
+        bloom_filter = insert(link_given, bloom_filter, k);
+    end
+    % Se a noticia for classificada como falsa
+    % Adiciona a fonte passada ao bloom filters
 
-    shingles = generateShingles(new, k);
+    numTrain = length(trainNews);
+    trainSignatures = zeros(numHash, numTrain);  % cada coluna será a assinatura de uma trainNews
+    
+    %for i = 1:numTrain
+    %    shingles2 = generateShingles(trainNews{i}, kshingles);
+    %    trainSignatures(:, i) = minhashSignatures(shingles2, numHash, p, R);
+    end
+
+
+    
+    shingles = generateShingles(new, kshingles);
     signature = minhashSignatures(shingles, numHash, p, R);
 
-    similJacc = zeros(length(trainNews),1);
-    for i = 1:length(trainNews)
-        
-        shingles2 = generateShingles(trainNews{i}, k);
-        signature2 = minhashSignatures(shingles2, hf, p, R);
+    similJacc = sum(trainSignatures == signature, 1) / numHash;
     
-        similJacc(i,1) = sum(signature1 == signature2) / hf;
+    load('similJacc.mat')
+    % Ordenar
+    [sortedSimil, newIdx] = sort(similJacc, 'descend');
+    
 
+    fprintf('\nTop 5 notícias mais semelhantes:\n');
+    for i = 1:5
+        if newIdx(i) < realTrainSize
+            fprintf('Real new : %s\n', realTrainNews{newIdx(i)});
+        else
+            fprintf('Fake new : %s\n', fakeTrainNews{newIdx(i) - realTrainSize});
+        end
+
+        fprintf('Similaridade: %.2f\n\n', sortedSimil(i));
     end
-    
+
 end
 
 %% Finalização do Programa
-
-% reset das variáveis
-clear
