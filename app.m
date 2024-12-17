@@ -63,14 +63,18 @@ if ismember == 1
     fprintf("Pressione Ctrl + C para saír.\n")
 else
     fprintf("O URL fornecido ('%s') não está marcado como fake news e terá de ser melhor avaliado.\n", link_given)
-    clear all;
+    clear;
     %% Parâmetros Iniciais do Classificador de Naive Bayes
     
     prompt = 'Insira o título da notícia: ';
     news_title = input(prompt, 's');
     
-    prompt = 'Insira o corpo da notícia ';
+    prompt = 'Insira o corpo da notícia (sem linhas brancas, tabs e enters): ';
     news_body = input(prompt, 's');
+    
+    % remover espaços brancos não desejados (expaços de 1 caracter entre palavras não contam)
+    news_body = regexprep(news_body, '(\n\s*\n)+', '\n');
+    news_body = strtrim(news_body);
 
     full_news = sprintf('%s %s', news_title, news_body);
     disp(full_news);
@@ -87,14 +91,22 @@ else
 
     
 %% Naive-Bayes Classifier Training
-
+    
+    % inicialização da waitbar para o treino do Naive Bayes
+    wb = waitbar(0, 'Putting Naive Bayes to work...');
+    totalSteps = 6;
+    currentStep = 0;
+    
     file_name1 = 'Data/processedTrue.csv';                   % file name of the real news vocabulary
     file_name2 = 'Data/processedFake.csv';                   % file name of the fake news vocabulary
     
     % Extract data
+    waitbar(currentStep / totalSteps, wb, 'Loading stuff...');
+
     realNews  = readcell(file_name1);                   % Cell array - each line is a real new
     fakeNews = readcell(file_name2);                    % Cell array - each line is a fake new
-    
+    currentStep = currentStep + 1;
+
     numFakeNews = length(fakeNews);                     % Total number of fake news
     numRealNews = length(realNews);                     % Total number of real news
     
@@ -111,12 +123,16 @@ else
     %R = randi(p, numHash,5);        % Matrix of random number for each hash function
     
     % Separate data set to have train and test data
+    waitbar(currentStep / totalSteps, wb, "It's still working...");
+
     fakeTrainSize = round(0.8 * numFakeNews);           % Set 80% of the fake news data for train
     fakeTrainNews = fakeNews(1:fakeTrainSize);          % Extract the 80% from the data for train
     
     fakeTrainNews = fakeTrainNews(cellfun(@(x) ischar(x) || isstring(x), fakeTrainNews));
     fakeTrainSize = length(fakeTrainNews);
-    
+
+    currentStep = currentStep + 1;
+
     %fakeSignatureMatrix = zeros(numHash, fakeTrainSize); % Initialize the matrix
     %for i = 1:fakeTrainSize
     %    shingles = generateShingles(fakeTrainNews{i}, k); 
@@ -142,7 +158,8 @@ else
     load('Files/realSignatureMatrix.mat')
 
     trainNews = [realTrainNews; fakeTrainNews];         % Build the train array with the firsts being the real news
-    
+
+    currentStep = currentStep + 1;
     % cellfun will apply a function to each element of a cell array (x)
     % ischar(x) will check if its a char array and isstring(x) will check if
     % its a string. This will create a logical array that meet this conditions
@@ -156,7 +173,9 @@ else
     %occurenceMatrix = getWordOccurences(trainNews, uniqueWords);
     load('Files/occurenceMatrix.mat')
     % Probability calculations for the Naive Bayes implementation
- 
+    
+    currentStep = currentStep + 1;
+
     possibleCases = length(trainNews);                  % Possibles cases
     
     % P('Fake'):
@@ -177,7 +196,9 @@ else
     % P(words | 'Fake'):
     %trainFake = occurenceMatrix(realTrainSize+1:end,:); % Occurence matrix of fake news
     load('Files/trainFake.mat')
-    
+
+    currentStep = currentStep + 1;
+
     wordCountFake = sum(trainFake) + 1;                 % Ocurrences of each word in fake news (numerator)
     totalWordsFake = sum(wordCountFake);                % Number of total words (denominator)
     
@@ -186,13 +207,17 @@ else
     new = full_news;                         % Extract current new
 
     % Classify the new
+    waitbar(currentStep / totalSteps, wb, 'Finalizing...');
     class = classifyNew(new, uniqueWords, probWordReal, probWordFake, probFake, probReal);
+    currentStep = currentStep + 1;
 
+    % finalizar a waitbar
+    close(wb);
     fprintf("Esta notícia está classificada como %s.\n",class)
-
+    
 end
 
 %% Finalização do Programa
 
 % reset das variáveis
-% clear
+clear
