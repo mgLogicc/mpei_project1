@@ -71,10 +71,6 @@ else
     
     prompt = 'Insira o corpo da notícia (sem linhas brancas, tabs e enters): ';
     news_body = input(prompt, 's');
-    
-    % remover espaços brancos não desejados (expaços de 1 caracter entre palavras não contam)
-    news_body = regexprep(news_body, '(\n\s*\n)+', '\n');
-    news_body = strtrim(news_body);
 
     full_news = sprintf('%s %s', news_title, news_body);
     disp(full_news);
@@ -117,10 +113,10 @@ else
     numFakeNews = length(fakeNews);                     % Total number of fake news
     numRealNews = length(realNews);                     % Total number of real news
     
-    %k = 5;                          % Size of shingles
-    %numHash = 300;                  % Number of hash functions
-    %p = 1e9 + 7;                    % High prime number
-    %R = randi(p, numHash,5);        % Matrix of random number for each hash function
+    k = 5;                          % Size of shingles
+    numHash = 300;                  % Number of hash functions
+    p = 1e9 + 7;                    % High prime number
+    R = randi(p, numHash,5);        % Matrix of random number for each hash function
     
     % Separate data set to have train and test data
     waitbar(currentStep / totalSteps, wb, "It's still working...");
@@ -213,11 +209,35 @@ else
 
     % finalizar a waitbar
     close(wb);
-    fprintf("Esta notícia está classificada como %s.\n",class)
+    fprintf("\nEsta notícia foi classificada como %s.\n",class)
+
+    numTrain = length(trainNews);
+    %trainSignatures = zeros(numHash, numTrain);  % cada coluna será a assinatura de uma trainNews
+    
+    %for i = 1:numTrain
+    %    shingles2 = generateShingles(trainNews{i}, k);
+    %    trainSignatures(:, i) = minhashSignatures(shingles2, numHash, p, R);
+    %end
+    
+    %shingles = generateShingles(new, k);
+    %signature = minhashSignatures(shingles, numHash, p, R);
+
+    %similJacc = sum(trainSignatures == signature, 1) / numHash;
+    
+    load('similJacc.mat')
+    % Ordenar
+    [sortedSimil, newIdx] = sort(similJacc, 'descend');
+    
+    fprintf('\nTop 5 notícias mais semelhantes:\n');
+    for i = 1:5
+        fprintf('New : %s\n', trainNews{newIdx(i)});
+        fprintf('Similaridade: %.2f\n\n', sortedSimil(i));
+    end
+
     
 end
 
 %% Finalização do Programa
 
 % reset das variáveis
-clear
+% clear

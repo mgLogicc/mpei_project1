@@ -2,13 +2,13 @@ function signature = minhashSignatures(shingles, numHash, p, R)
     %   This function returns the signatures of the shingles passed in
     % 
     %   Inputs:
-    %   - shingles :
-    %   - numHash : 
-    %   - p : 
-    %   - R : 
+    %   - shingles : cell array of shingles of a new
+    %   - numHash : number of hash functions
+    %   - R : matrix where each line represents a different hash function
+    %   - p : a prime number used has divisor in the mod operation
     %
     %   Output:
-    %   signature:
+    %   signature: signature vector of the shingles
 
     size = length(shingles);
     signature = zeros(numHash,1);

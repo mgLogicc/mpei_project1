@@ -11,8 +11,17 @@ function class = classifyNew(new, uniqueWords, probWordReal, probWordFake, probF
     %
     %   Output:
     %   - class : class given to the new (fake or real)
-    disp(new)
+    
+    % Predefined stop words list
+    stopWords = ["a", "an", "and", "the", "is", "in", "on", "at", "of", "for", "to", "by", "with", "this", "that", "it"];
+    
+    % Convert input news to lowercase
+    new = lower(new);
+
     words = split(new);                 % Extract current new's words
+
+    % Remove stop words
+    words = words(~ismember(words, stopWords));
     
     % We are going to work with logaritmic values to avoid underflow
     logProbFake = log(probFake);        
@@ -29,8 +38,8 @@ function class = classifyNew(new, uniqueWords, probWordReal, probWordFake, probF
     logProbReal = logProbReal + sum(log(probWordReal(validIdx)));
    
     if logProbFake > logProbReal
-        class = 'Falsa';
+        class = 'Fake';
     else
-        class = 'Verdadeira';
+        class = 'Real';
     end
 end

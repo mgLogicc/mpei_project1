@@ -1,12 +1,14 @@
 function hc = hash_function_shingles(element, hf, R, p)
-%       This function calculates the hash code for a given string element
-%       
-%       Inputs:
-%       - element : sequence of chars
-%       - hf : index of the hash function 
-%       - R : matrix where each line represents a different hash function
-%       - p : a prime number used has divisor in the mod operation
-%
+    %   This function calculates the hash code for a given string element
+    %       
+    %   Inputs:
+    %   - element : sequence of chars
+    %   - hf : index of the hash function 
+    %   - R : matrix where each line represents a different hash function
+    %   - p : a prime number used has divisor in the mod operation
+    %
+    %   Outputs:
+    %   - hc : hash codes of the shingles
 
     r = R(hf, :);               % get the hash function line
     
