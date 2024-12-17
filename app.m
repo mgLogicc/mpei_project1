@@ -124,7 +124,7 @@ else
     %    
     %    fakeSignatureMatrix(:, i) = signature; 
     %end
-    load('fakeSignatureMatrix.mat')
+    load('Files/fakeSignatureMatrix.mat')
 
     realTrainSize = round(0.8 * numRealNews);           % Same process as before, but for the real news data
     realTrainNews = realNews(1:realTrainSize);
@@ -139,7 +139,7 @@ else
     %    
     %    realSignatureMatrix(:,i) = signature;
     %end
-    load('realSignatureMatrix.mat')
+    load('Files/realSignatureMatrix.mat')
 
     trainNews = [realTrainNews; fakeTrainNews];         % Build the train array with the firsts being the real news
     
@@ -151,10 +151,10 @@ else
     
     % Get unique words
     %uniqueWords = extractUniqueWords(trainNews); 
-    load('uniqueWords.mat')
+    load('Files/uniqueWords.mat')
     % Get word occurences 
     %occurenceMatrix = getWordOccurences(trainNews, uniqueWords);
-    load('occurenceMatrix.mat')
+    load('Files/occurenceMatrix.mat')
     % Probability calculations for the Naive Bayes implementation
  
     possibleCases = length(trainNews);                  % Possibles cases
@@ -167,7 +167,7 @@ else
     
     % P(words | 'Real'):
     %trainReal = occurenceMatrix(1:realTrainSize,:);     % Occurence matrix of real news
-    load('trainReal.mat')
+    load('Files/trainReal.mat')
 
     wordCountReal = sum(trainReal) + 1;                 % Ocurrences of each word in real news (numerator)
     totalWordsReal = sum(wordCountReal);                % Number of total words (denominator)
@@ -176,7 +176,7 @@ else
     
     % P(words | 'Fake'):
     %trainFake = occurenceMatrix(realTrainSize+1:end,:); % Occurence matrix of fake news
-    load('trainFake.mat')
+    load('Files/trainFake.mat')
     
     wordCountFake = sum(trainFake) + 1;                 % Ocurrences of each word in fake news (numerator)
     totalWordsFake = sum(wordCountFake);                % Number of total words (denominator)
