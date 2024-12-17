@@ -1,14 +1,14 @@
 %% ficheiro de desenvolvimento e teste do Bloom Filter
 
 % testes
-test_links = belong_links(); % links que pertencem
-% test_links = dontbelong_links(); % links que não pertencem
+% test_links = belong_links(); % links que pertencem
+test_links = dontbelong_links(); % links que não pertencem
 
 ones1 = 0; % nº de positivos
 zeros0 = 0; % nº de negativos
 
-% array para armazenar resultado 
-results = {};
+% table 
+results = table();
 
 for l = 1:length(test_links) % for de teste
 test_link = test_links{l}; % link em teste
@@ -50,9 +50,12 @@ else
     fprintf('A notícia do site "%s" não está registada como possível fake news!\n', test_link)
 end
 
-% Adicionando os resultados ao array
-results{1, l} = test_link;  % Adiciona o link na primeira linha
-results{2, l} = ismember;
+% Adicionando os resultados à tabela
+    results = [results; table(test_link, ismember)]; % adicionar linha de resultados
+end
+
+% Exibir a tabela com os resultados
+disp(results);
 
 end % end do for de teste
 

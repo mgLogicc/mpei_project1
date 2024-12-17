@@ -32,21 +32,36 @@ for i = 1:height(urls)
     % disp(data.site_url{i}); % mostrar o que foi inserido
 end
 
-%% Inserção de Primeira Variável
+%% Escolha de Tipo de Teste e Inserção de Primeira Variável
 while true
-    % inserção do link
-    prompt = 'Insira o link da notícia: ';
-    link_given = input(prompt,'s');
-
-    % Expressão regular para verificar qualquer domínio possível
-    % A expressão busca por um ponto seguido de uma sequência de letras (2 ou mais caracteres)
-    pattern = '\.[a-zA-Z]{2,}$';
+    % pedir um input ao utilizador
+    prompt = 'Insira "0" para teste manual ou "1" para teste automático: ';
+    test_format = input(prompt, 's'); 
     
-    % Verificação da existência da extensão no link
-    if ~isempty(regexpi(link_given, pattern, 'once'))
+    test_format_num = str2double(test_format); % transformar a string em número
+
+    if ~isnan(test_format_num) && (test_format_num == 1 || test_format_num == 0) % verificar se o input é válido
         break
-    else
-        fprintf('O link não contém uma extensão válida.\n');
+    end
+    fprintf('Resposta inválida! Insira 1 ou 0 para manual ou automático respetivamente.\n')
+end
+
+if test_format_num == 0
+    while true
+        % inserção do link
+        prompt = 'Insira o link da notícia: ';
+        link_given = input(prompt,'s');
+    
+        % Expressão regular para verificar qualquer domínio possível
+        % A expressão busca por um ponto seguido de uma sequência de letras (2 ou mais caracteres)
+        pattern = '\.[a-zA-Z]{2,}$';
+        
+        % Verificação da existência da extensão no link
+        if ~isempty(regexpi(link_given, pattern, 'once'))
+            break
+        else
+            fprintf('O link não contém uma extensão válida.\n');
+        end
     end
 end
 
