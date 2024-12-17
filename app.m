@@ -2,9 +2,10 @@
 
 % adição no matlab das paths dos diretórios relevantes ao programa
 addpath('BloomFilter')
-%addpath('NaiveBayes')
-%addpath('MinHash')
+addpath('NaiveBayes')
+addpath('MinHash')
 addpath('Data')
+addpath('Files')
 
 %% Parâmetros iniciais do Bloom Filter
 
@@ -84,15 +85,11 @@ else
     %numFakeNews = length(fakeNews);                     % Total number of fake news
     %numRealNews = length(realNews);                     % Total number of real news
 
-    %k = 5;                          % Size of shingles
-    %numHash = 300;                  % Number of hash functions
-    %p = 1e9 + 7;                    % High prime number
-    %R = randi(p, numHash,5);        % Matrix of random number for each hash function
     
 %% Naive-Bayes Classifier Training
 
-    file_name1 = 'processedTrue.csv';                   % file name of the real news vocabulary
-    file_name2 = 'processedFake.csv';                   % file name of the fake news vocabulary
+    file_name1 = 'Data/processedTrue.csv';                   % file name of the real news vocabulary
+    file_name2 = 'Data/processedFake.csv';                   % file name of the fake news vocabulary
     
     % Extract data
     realNews  = readcell(file_name1);                   % Cell array - each line is a real new
@@ -191,8 +188,7 @@ else
     % Classify the new
     class = classifyNew(new, uniqueWords, probWordReal, probWordFake, probFake, probReal);
 
-    fprintf(class)
-    fprint('\n')
+    fprintf("Esta notícia está classificada como %s.\n",class)
 
 end
 
@@ -200,9 +196,3 @@ end
 
 % reset das variáveis
 % clear
-
-% remoção no matlab das paths dos diretórios adicionados no início
-rmpath('BloomFilter')
-rmpath('NaiveBayes')
-rmpath('MinHash')
-rmpath('Data')

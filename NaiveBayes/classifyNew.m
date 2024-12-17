@@ -29,8 +29,8 @@ function class = classifyNew(new, uniqueWords, probWordReal, probWordFake, probF
     logProbReal = logProbReal + sum(log(probWordReal(validIdx)));
    
     if logProbFake > logProbReal
-        class = 'Fake';
+        class = 'Falsa';
     else
-        class = 'Real';
+        class = 'Verdadeira';
     end
 end
