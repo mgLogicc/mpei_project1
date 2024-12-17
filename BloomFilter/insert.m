@@ -1,6 +1,12 @@
 %% insert
 function bloom_filter = insert(element, bloom_filter, k)
     % inserir elementos no bloom_filter utilizando k functions
+    %
+    % element: elemento a inserir
+    % bloom_filter: bloom filter inicializado
+    % k: funções de dispersão
+    
+    % Início do processo
     for i = 1:k
         % criar uma key para cada hash function
         key = [element num2str(i)];

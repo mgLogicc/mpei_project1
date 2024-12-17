@@ -1,7 +1,7 @@
 % hash function para gerar um código hash para cada string
 function Hash = strhash(str, seed)
     % A simple hash function with a seed value to introduce variatio
-    % entrada: string a ser convertida
+    % entrada: string a ser convertida e valor inicial do hash (seed)
     % saída: valor Hash correspondente
 
     % Inicializar valor do hash
